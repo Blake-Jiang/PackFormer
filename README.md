@@ -173,13 +173,34 @@ python eval_bpp.py --logs_dir your/custom/path --policy_type multi_input
 
 # 评估 Transformer 模型
 python eval_bpp.py --logs_dir your/custom/path --policy_type transformer
+
+# 生成装箱过程可视化
+python eval_bpp.py --logs_dir your/custom/path --visualize
+
+# 指定评估结果保存路径
+python eval_bpp.py --logs_dir your/custom/path --output_dir custom_results
 ```
 
 参数说明：
 - `--logs_dir`: 指定日志目录路径，默认为 "logs"
-- `--policy_type`: 指定要评估的策略类型，可选值为：
+- `--policy_type`: 指定要评估的策略类型：
   - `multi_input`: MLP 策略（默认）
   - `transformer`: Transformer 策略
+- `--visualize`: 是否生成装箱过程的可视化动画
+- `--output_dir`: 指定输出目录的根路径，默认为 "test_results"
+
+评估输出：
+```
+test_results/
+└── your_model_name/
+    └── 20240101_123456/          # 时间戳目录
+        ├── logs/                 # 评估日志
+        │   └── eval_results.txt  # 详细评估结果
+        └── visualizations/       # 可视化结果（如果启用）
+            ├── height_maps_episode_0.gif
+            ├── height_maps_episode_1.gif
+            └── ...
+```
 
 预训练模型：
 - 您可以从项目的 [Releases](https://github.com/Blake-Jiang/PackFormer/releases) 页面下载预训练的模型检查点
