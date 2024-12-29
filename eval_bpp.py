@@ -7,10 +7,11 @@ import envs
 import os
 import datetime
 import argparse
+from policies.transformer_policy import CustomTransformerPolicy
 
 
 def evaluate_model(
-    model_path, vec_normalize_path, env_id="BinPacking3D-v0", n_eval_episodes=10
+    model_path, vec_normalize_path, policy_type="multi_input", env_id="BinPacking3D-v0", n_eval_episodes=10
 ):
     """
     评估训练好的模型
@@ -32,7 +33,12 @@ def evaluate_model(
     log_print(f"评估回合数: {n_eval_episodes}")
     log_print("=" * 50)
 
-    env = gym.make(env_id, container_size=(10, 10, 10), n_boxes_range=(10, 10))
+    env = gym.make(
+        env_id,
+        container_size=(10, 10, 10),
+        n_boxes_range=(5, 15),
+        use_position_mask=False
+    )
     env = DummyVecEnv([lambda: env])
 
     env = VecNormalize.load(vec_normalize_path, env)
@@ -40,7 +46,16 @@ def evaluate_model(
     env.norm_reward = False
 
     unwrapped_env = env.unwrapped.envs[0].unwrapped
-    model = PPO.load(model_path)
+
+    if policy_type == "transformer":
+        model = PPO.load(
+            model_path,
+            custom_objects={
+                "policy_class": CustomTransformerPolicy
+            }
+        )
+    else:
+        model = PPO.load(model_path)
 
     episode_stats = []
 
@@ -129,8 +144,24 @@ def evaluate_model(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="评估3D装箱模型")
     parser.add_argument("--logs_dir", type=str, default="logs", help="日志目录路径")
+    parser.add_argument(
+        "--policy_type",
+        type=str,
+        choices=["multi_input", "transformer"],
+        default="multi_input",
+        help="要评估的策略类型"
+    )
     args = parser.parse_args()
 
-    model_path = os.path.join(args.logs_dir, "best_model/best_model.zip")
-    vec_normalize_path = os.path.join(args.logs_dir, "vec_normalize.pkl")
-    evaluate_model(model_path, vec_normalize_path)
+    if args.policy_type == "transformer":
+        model_path = os.path.join(args.logs_dir, "best_model/best_model.zip")
+        vec_normalize_path = os.path.join(args.logs_dir, "env_checkpoints/vec_normalize_150000_steps.pkl")
+    else:
+        model_path = os.path.join(args.logs_dir, "best_model/best_model.zip")
+        vec_normalize_path = os.path.join(args.logs_dir, "vec_normalize.pkl")
+
+    evaluate_model(
+        model_path, 
+        vec_normalize_path,
+        policy_type=args.policy_type
+    )
