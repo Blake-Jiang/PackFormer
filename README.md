@@ -168,15 +168,26 @@ python train_transformer_bpp.py --continue_training --load_path transformer_YYYY
 ### 评估
 
 ```bash
-# 使用默认日志路径 (logs/)
-python eval_bpp.py
+# 评估 MLP 模型（默认）
+python eval_bpp.py --logs_dir your/custom/path --policy_type multi_input
 
-# 使用自定义日志路径
-python eval_bpp.py --logs_dir your/custom/path
+# 评估 Transformer 模型
+python eval_bpp.py --logs_dir your/custom/path --policy_type transformer
 ```
 
 参数说明：
-- `--logs_dir`: 指定日志目录路径，默认为 "logs"。该目录下需包含 best_model/best_model.zip 和 vec_normalize.pkl 文件。如果使用官方 checkpoint，则需要将 checkpoint 文件夹复制到 logs/ 目录下或指定路径。
+- `--logs_dir`: 指定日志目录路径，默认为 "logs"
+- `--policy_type`: 指定要评估的策略类型，可选值为：
+  - `multi_input`: MLP 策略（默认）
+  - `transformer`: Transformer 策略
+
+预训练模型：
+- 您可以从项目的 [Releases](https://github.com/Blake-Jiang/PackFormer/releases) 页面下载预训练的模型检查点
+- 下载后将文件解压到项目的 `logs` 目录下即可使用
+
+注意：
+- 对于 MLP 策略，需要确保指定目录下存在 `best_model/best_model.zip` 和 `vec_normalize.pkl` 文件
+- 对于 Transformer 策略，需要确保指定目录下存在 `best_model/best_model.zip` 和 `env_checkpoints/vec_normalize_150000_steps.pkl` 文件，这里的 `150000` 是最后一个checkpoint 保存时的步数，需要根据实际情况调整
 
 
 
