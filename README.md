@@ -6,6 +6,10 @@
 
 基于论文 [Solving 3D packing problem using Transformer network and reinforcement learning](https://www.sciencedirect.com/science/article/pii/S0957417422021716) 的非官方实现。
 
+## 演示
+
+![装箱过程演示](assets/demo.gif)
+
 ## 项目结构
 
 ```
